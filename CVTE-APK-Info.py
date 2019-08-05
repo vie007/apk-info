@@ -73,6 +73,13 @@ def getAppName(res1, res2):
             return linebits1['label']
     else:
         return None
+
+def getCPUFamewok(res):
+    string = ''
+    for line in res:
+        if line.find('native-code:') == 0:
+            string += re.search("\'.*\'", line).group() +'\r\n'
+    return string.replace('\'', '')
     
 def getIconPix(path, res):
 #    os.popen('ERASE /Q icon.png')
@@ -248,13 +255,18 @@ class UI_init(QWidget):
         self.btn1.clicked.connect(self.determine)
     
         self.appName = QLabel(self)
-        self.appName.setText('应用名称')
+        self.appName.setText('应用名称/CPU架构')
         self.appName.setFont(QFont("Timers", 10))
         self.appName.move(0, 60)
         self.appNameIs = QLineEdit(self)
         self.appNameIs.setFont(QFont("Timers", 10))
-        self.appNameIs.setGeometry(150,60,450,20)
+        self.appNameIs.setGeometry(150,60,300,20)
         self.appNameIs.setReadOnly(True)
+        self.CPUFamewokIs = QLineEdit(self)
+        self.CPUFamewokIs.setFont(QFont("Timers", 10))
+        self.CPUFamewokIs.setGeometry(470,60,130,20)
+        self.CPUFamewokIs.setReadOnly(True)
+        
 
         self.version = QLabel(self)
         self.version.setText('发布版本/架构版本')
@@ -423,6 +435,7 @@ class UI_init(QWidget):
         b, w, packageName, versionCode, versionName = getPackage(res1,path)
         if b is "true":
             self.appNameIs.setText(getAppName(res1,res2))
+            self.CPUFamewokIs.setText(getCPUFamewok(res1))
             self.pubilcVersionIs.setText(versionName)
             self.frameworkVersionIs.setText(versionCode)
             self.packageNameIs.setText(packageName)
