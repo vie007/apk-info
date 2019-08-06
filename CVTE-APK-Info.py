@@ -414,6 +414,7 @@ class UI_init(QWidget):
 
     def setDisplay(self):
         path = self.editpath.text()#'C:/Users/user/Desktop/cvte-TvService-2.6.0.apk'
+        path = "\"%s\""%path 
         commond1 = 'aapt dump badging %s' % path
         res1=''
         try:
@@ -445,11 +446,11 @@ class UI_init(QWidget):
             self.densityNameIs.setText(getDensities(res1))
             self.permissionsNameIs.setPlainText(getPermission(res1))
             self.attributeNameIs.setPlainText(getApplication(res1))
-            self.fileSizeNameIs.setText(getFileSize(path))
-            self.fileMD5NameIs.setText(getBigFileMD5(path))
-            self.currentNameIs.setText(path.split('/')[-1])
+            self.fileSizeNameIs.setText(getFileSize(path.replace('\"','')))
+            self.fileMD5NameIs.setText(getBigFileMD5(path.replace('\"','')))
+            self.currentNameIs.setText(path.replace('\"','').split('/')[-1])
             self.newNameIs.setText(getAppName(res1,res2)+' '+versionName+'.'+versionCode+'.apk')
-            self.picture.setPixmap(getIconPix(path,res1))
+            self.picture.setPixmap(getIconPix(path.replace('\"',''),res1))
         else:
             QMessageBox.warning(self,"Error", w)
         
