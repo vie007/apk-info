@@ -229,6 +229,7 @@ class UI_init(QWidget):
     def __init__(self):
         super(UI_init, self).__init__()
         # 窗口标题
+        self.setWindowIcon(QIcon('./icons/cvte_window.ico'))
         self.setWindowTitle('CVTE-APK-INFO')
         # 定义窗口大小
         self.resize(700, 500)
