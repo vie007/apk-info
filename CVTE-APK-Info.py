@@ -414,12 +414,16 @@ class UI_init(QWidget):
         self.picture.clear()
 
     def setDisplay(self):
+        st = subprocess.STARTUPINFO()
+        st.dwFlags = subprocess.CREATE_NEW_CONSOLE | subprocess.STARTF_USESHOWWINDOW
+        st.wShowWindow = subprocess.SW_HIDE
+        
         path = self.editpath.text()#'C:/Users/user/Desktop/cvte-TvService-2.6.0.apk'
         path = "\"%s\""%path 
         commond1 = 'aapt dump badging %s' % path
         res1=''
         try:
-            adb1 = subprocess.Popen(commond1, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+            adb1 = subprocess.Popen(commond1, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE,startupinfo=st)
             res1 = adb1.communicate()[0].decode().split("\r\n")
         except Exception as err:
             1+1 #空操作
@@ -427,7 +431,7 @@ class UI_init(QWidget):
         commond2 = 'aapt dump strings %s' % path
         res2=''
         try:
-            adb2 = subprocess.Popen(commond2, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+            adb2 = subprocess.Popen(commond2, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE,startupinfo=st)
             res2 = adb2.communicate()[0].decode().split("\r\n")
         except Exception as err:
             1+1 #空操作
