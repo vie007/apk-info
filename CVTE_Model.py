@@ -47,18 +47,24 @@ class CVTE_Model:
             if linebits['icon'] is '':
                 return None
             else:
-                return linebits['icon']
+                return linebits['icon'].split('\'',1)[0]
         else:
             return None
 
     def parse_icon(self,filePath, iconPath):
         if iconPath == None:
             return
-        zip = zipfile.ZipFile(filePath)
-        iconData = zip.read(iconPath)
-        saveIconName = "icon.png"
-        with open(saveIconName,'w+b') as saveIconFile:
-            saveIconFile.write(iconData)
+        try:
+            zip = zipfile.ZipFile(filePath)
+            print("parse_icon: zipfile ending,path is %s"%iconPath)
+            iconData = zip.read(iconPath)
+            print("parse_icon: read data ending")
+            saveIconName = "./icon.png"
+            with open(saveIconName,'wb') as saveIconFile:
+                print("parse_icon:open file succeed")
+                saveIconFile.write(iconData)
+        except Exception as err:
+            print("失败原因：{}".format(str(err)))
 
 
     def getAppName(self,res1, res2):
@@ -81,9 +87,11 @@ class CVTE_Model:
                 if show2 is '':
                     return None
                 else:
+                    print("getAppName:1 is %s"%show2.split(': ')[-1])
                     return show2.split(': ')[-1]
             else:
-                return linebits1['label']
+                print("getAppName:2 is %s"%linebits1['label'])
+                return linebits1['label'].split('\'',1)[0]
         else:
             return None
 
@@ -100,6 +108,7 @@ class CVTE_Model:
             for name in files:
                 if(name.endswith(".png")):
                     os.remove(os.path.join(root, name))
+        print("getIconPix:for in for ending")
         self.parse_icon(path,self.getIconPath(res))
         print("parse_icon succeed")
         pix = QPixmap('icon.png')
