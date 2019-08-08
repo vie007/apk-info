@@ -4,6 +4,8 @@ import os
 import hashlib
 import zipfile
 import subprocess
+import time
+import datetime
 from PyQt5.QtWidgets import *
 from PyQt5.QtCore import *
 from PyQt5.QtGui import *
@@ -12,25 +14,26 @@ from PyQt5.QtGui import *
 from CVTE_Controller import CVTE_Controller
 from CVTE_View import CVTE_View
 
+date = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+model = "CVTE_Model"
+fd = None
 
 class CVTE_Model:
     def __init__(self):
         self.controller = None
         self.view = None
-
-    def str(self):
-        return '111'
+        
     
     def ToDealWithVersionNameString(self,string):
-        str = ''
+        str1 = ''
         for word in string:
             if word >= '0' and word <= '9':
-                str += word
+                str1 += word
             elif word is '.':
-                str += word
+                str1 += word
             else :
                 break
-        return  str;
+        return  str1;
             
 
     def getIconPath(self,res):
@@ -45,18 +48,24 @@ class CVTE_Model:
         if regMatch:
             linebits = regMatch.groupdict()
             if linebits['icon'] is '':
+                fd.writelines(['\n[{}]'.format(date),':[{}]'.format(model), 'getIconPath():path is None'])
                 return None
             else:
+                fd.writelines(['\n[{}]'.format(date),':[{}]'.format(model), 'getIconPath():path analyze result is {}'.format(linebits['icon'].split('\'',1)[0])])
                 return linebits['icon'].split('\'',1)[0]
         else:
+            fd.writelines(['\n[{}]'.format(date),':[{}]'.format(model), 'getIconPath():path is None'])
             return None
+        
 
     def parse_icon(self,filePath, iconPath):
         if iconPath == None:
             return
         try:
+            fd.writelines(['\n[{}]'.format(date),':[{}]'.format(model), 'parse_icon():enter ZipFile'])
             zip = zipfile.ZipFile(filePath)
             print("parse_icon: zipfile ending,path is %s"%iconPath)
+            fd.writelines(['\n[{}]'.format(date),':[{}]'.format(model), 'parse_icon():enter zip.read'])
             iconData = zip.read(iconPath)
             print("parse_icon: read data ending")
             saveIconName = "./icon.png"
@@ -64,7 +73,24 @@ class CVTE_Model:
                 print("parse_icon:open file succeed")
                 saveIconFile.write(iconData)
         except Exception as err:
+            fd.writelines(['\n[{}]'.format(date),':[{}]'.format(model), 'parse_icon():result failed is {}'.format(str(err))])
             print("失败原因：{}".format(str(err)))
+            
+
+    def getIconPix(self,path, res):
+    #    os.popen('ERASE /Q icon.png')
+        for root, dirs, files in os.walk('./'):
+            for name in files:
+                if(name.endswith(".png")):
+                    os.remove(os.path.join(root, name))
+        print("getIconPix:for in for ending")
+        fd.writelines(['\n[{}]'.format(date),':[{}]'.format(model), 'getIconPix(): enter getIconPath and parse_icon'])
+        self.parse_icon(path,self.getIconPath(res))
+        print("parse_icon succeed")
+        pix = QPixmap('icon.png')
+        print(pix)
+        fd.close()
+        return pix 
 
 
     def getAppName(self,res1, res2):
@@ -88,8 +114,10 @@ class CVTE_Model:
                     return None
                 else:
                     print("getAppName:1 is %s"%show2.split(': ')[-1])
+                    fd.writelines(['\n[{}]'.format(date),':[{}]'.format(model), 'getAppName(): name is {}'.format(show2.split(': ')[-1])])
                     return show2.split(': ')[-1]
             else:
+                fd.writelines(['\n[{}]'.format(date),':[{}]'.format(model), 'getAppName(): name is {}'.format(linebits1['label'].split('\'',1)[0])])
                 print("getAppName:2 is %s"%linebits1['label'])
                 return linebits1['label'].split('\'',1)[0]
         else:
@@ -100,30 +128,22 @@ class CVTE_Model:
         for line in res:
             if line.find('native-code:') == 0:
                 string += re.search("\'.*\'", line).group() +'\r\n'
+        fd.writelines(['\n[{}]'.format(date),':[{}]'.format(model), 'getCPUFamewok(): string is {}'.format(string.replace('\'', ''))])
         return string.replace('\'', '')
-        
-    def getIconPix(self,path, res):
-    #    os.popen('ERASE /Q icon.png')
-        for root, dirs, files in os.walk('./'):
-            for name in files:
-                if(name.endswith(".png")):
-                    os.remove(os.path.join(root, name))
-        print("getIconPix:for in for ending")
-        self.parse_icon(path,self.getIconPath(res))
-        print("parse_icon succeed")
-        pix = QPixmap('icon.png')
-        print(pix)
-        return pix  
+         
 
     def getPackage(self, res, path):
-        print("getPackage the res is %s"%res)
-        print("getPackage the path is %s"%path)
+        global fd
+        fd = open("log.txt", "a+")
+        print (datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'))
+        fd.write("\n\n\n")
         show = ''
         for line in res:
             if line.find('package') == 0:
                 show += line
                 print(show)
                 break;
+        fd.writelines(['\n[{}]'.format(date),':[{}]'.format(model), 'getPackage():show = {}'.format(show)])
         reg = re.compile(
             ".*name='(?P<packageName>.*)' versionCode='(?P<versionCode>.*)' versionName='(?P<versionName>.*)'")
         print(reg)
@@ -135,10 +155,11 @@ class CVTE_Model:
             print(linebits['packageName'])
             print(linebits['versionCode'])
             print(self.ToDealWithVersionNameString(linebits['versionName']))
-                  
+            fd.writelines(['\n[{}]'.format(date),':[{}]'.format(model), 'getPackage():regMatch success!!'])
             return "true", "apk文件分析成功", linebits['packageName'], linebits['versionCode'], self.ToDealWithVersionNameString(linebits['versionName'])
         else:
-            print('false')
+            fd.writelines(['\n[{}]'.format(date),':[{}]'.format(model), 'getPackage():regMatch failed!!'])
+            fd.close()
             return "false", "apk文件aapt分析操作失败，请确保文件路径({})是否书写正确".format(path), None, None, None
 
 
@@ -207,8 +228,11 @@ class CVTE_Model:
         md5obj = hashlib.md5()
         maxbuf = 8192
         try:
+            fd.writelines(['\n[{}]'.format(date),':[{}]'.format(model), 'getBigFileMD5():being open {}'.format(filepath)])
             f = open(filepath, 'rb')
         except Exception as err:
+            fd.writelines(['\n[{}]'.format(date),':[{}]'.format(model), 'getBigFileMD5():open faile ,Please check the{}'.format(filepath)])
+            
             return "获取文件的md5失败,找不到文件，请确保文件路径（{}）是否书写正确".format(filepath)
         while True:
             buf = f.read(maxbuf)
@@ -223,9 +247,11 @@ class CVTE_Model:
     # 字节bytes转化kb\m\g
     def formatSize(self,bytes):
         try:
+            fd.writelines(['\n[{}]'.format(date),':[{}]'.format(model), 'formatSize():being Byte conversion '])
             bytes = float(bytes)
             kb = bytes / 1024
         except:
+            fd.writelines(['\n[{}]'.format(date),':[{}]'.format(model), 'formatSize(): Byte conversion faile!!'])
             return "Error,传入的字节格式不对"
 
         if kb >= 1024:

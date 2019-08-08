@@ -54,12 +54,7 @@ class CVTE_Controller:
             1+1 #空操作
            # print(commond2+',Command parsing results are too long!')
            # QMessageBox.warning(self,"Warning", commond2+',Command parsing results are too long!')
-        print("commond1 is %s"%commond1)
-        print("commond2 is %s"%commond2)
-        print("res1 is %s"%res1)
-        print("res1 is %s"%res2)
 
-        print(self.model.ToDealWithVersionNameString('2.060.0'))
         
         b, information, packageName, versionCode, versionName = self.model.getPackage(res1,path)
         print("Analytical conditions is %s"%b)
