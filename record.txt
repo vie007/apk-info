@@ -1,1 +1,1 @@
-编译命令：pyinstaller -F CVTE-APK-Info.py --noconsole
+﻿编译命令：pyinstaller -F CVTE-APK-Info.py -p CVTE_Model.py -p CVTE_View.py -p CVTE_Controller.py --noconsole
