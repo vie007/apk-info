@@ -37,7 +37,7 @@ class CVTE_Controller:
         
         path = self.view.editpath.text()#'C:/Users/user/Desktop/cvte-TvService-2.6.0.apk'
         path = "\"%s\""%path 
-        commond1 = './tool/aapt dump badging %s' % path
+        commond1 = './tools/aapt dump badging %s' % path
         res1=''
         try:
             adb1 = subprocess.Popen(commond1, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE,startupinfo=st)
@@ -45,7 +45,7 @@ class CVTE_Controller:
         except Exception as err:
             1+1 #空操作
         
-        commond2 = './tool/aapt dump strings %s' % path
+        commond2 = './tools/aapt dump strings %s' % path
         res2=''
         try:
             adb2 = subprocess.Popen(commond2, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE,startupinfo=st)
