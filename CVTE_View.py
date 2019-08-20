@@ -168,6 +168,7 @@ class CVTE_View(QWidget):
 
         self.picture = QLabel(self)
         self.picture.setGeometry(610,60,88,70)
+        self.picture.setScaledContents (True)
        # self.picture.setStyleSheet("border: 2px solid red")
 
     
@@ -177,6 +178,9 @@ class CVTE_View(QWidget):
         self.editpath.setText(evn.mimeData().text().split('///')[-1])
         #鼠标放开函数事件
         evn.accept()
+
+    def dropEvent(self, evn):
+        self.determine()
 
             
     def determine(self):
